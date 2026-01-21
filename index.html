@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link Beautify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .output-box {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 50px;
+            word-break: break-all;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .output-text {
+            flex: 1;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .output-text.empty {
+            color: #999;
+            font-style: italic;
+            font-weight: normal;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-left: 10px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .status-message.show {
+            opacity: 1;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .example {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 5px;
+        }
+
+        .example-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .example-content {
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .example-link {
+            display: block;
+            word-break: break-all;
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .arrow {
+            color: #667eea;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Link Beautify</h1>
+        <p class="subtitle">복잡한 URL을 깔끔하게 정리해드립니다</p>
+
+        <div class="input-group">
+            <label for="urlInput">URL 입력</label>
+            <input type="text" id="urlInput" placeholder="https://example.com/page?param1=value1&param2=value2..." autofocus>
+        </div>
+
+        <div class="input-group">
+            <label>정리된 URL</label>
+            <div class="output-box">
+                <span class="output-text empty" id="output">여기에 정리된 링크가 표시됩니다</span>
+                <button class="copy-btn" id="copyBtn" style="display: none;">복사</button>
+            </div>
+        </div>
+
+        <div class="status-message" id="statusMessage"></div>
+
+        <div class="example">
+            <div class="example-title">💡 사용 예시</div>
+            <div class="example-content">
+                <strong>게시판 링크</strong>
+                <span class="example-link">입력: http://alphaenc.kr/bbs/board.php?bo_table=alpha_qna&wr_id=8540&sst=wr_hit&sod=desc&page=191</span>
+                <span class="arrow">↓</span>
+                <span class="example-link">결과: http://alphaenc.kr/bbs/board.php?bo_table=alpha_qna&wr_id=8540</span>
+                
+                <br><br>
+                
+                <strong>쇼핑몰 링크</strong>
+                <span class="example-link">입력: https://item.gmarket.co.kr/Item?spm=...&goodscode=4616754557&utparam-url=...</span>
+                <span class="arrow">↓</span>
+                <span class="example-link">결과: https://item.gmarket.co.kr/Item?goodscode=4616754557&spm=...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const urlInput = document.getElementById('urlInput');
+        const output = document.getElementById('output');
+        const copyBtn = document.getElementById('copyBtn');
+        const statusMessage = document.getElementById('statusMessage');
+
+        function beautifyURL(url) {
+            try {
+                const urlObj = new URL(url);
+                const params = new URLSearchParams(urlObj.search);
+                
+                // 보존할 주요 파라미터들
+                const keepParams = [
+                    'bo_table', 'wr_id',  // 그누보드
+                    'id', 'no', 'idx', 'num',  // 일반 게시판
+                    'article_id', 'post_id', 'board_id',  // 기타 게시판
+                    'goodscode', 'spm',  // G마켓, 쿠팡 등 쇼핑몰
+                    'itemId', 'productId', 'prod_id',  // 기타 쇼핑몰
+                    'v', 'video_id',  // 유튜브
+                ];
+                const newParams = new URLSearchParams();
+                
+                keepParams.forEach(param => {
+                    if (params.has(param)) {
+                        newParams.set(param, params.get(param));
+                    }
+                });
+                
+                const queryString = newParams.toString();
+                return urlObj.origin + urlObj.pathname + (queryString ? '?' + queryString : '');
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function showStatus(message, type = 'success') {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message show ${type}`;
+            setTimeout(() => {
+                statusMessage.classList.remove('show');
+            }, 3000);
+        }
+
+        async function copyToClipboard(text) {
+            try {
+                // 최신 브라우저의 Clipboard API 사용
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                    showStatus('✅ 클립보드에 복사되었습니다!');
+                } else {
+                    // 구형 브라우저 또는 비보안 컨텍스트를 위한 fallback
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showStatus('✅ 클립보드에 복사되었습니다!');
+                    } catch (err) {
+                        showStatus('❌ 복사 중 오류가 발생했습니다.', 'error');
+                    }
+                    textArea.remove();
+                }
+            } catch (err) {
+                showStatus('❌ 복사 중 오류가 발생했습니다.', 'error');
+                console.error('Copy error:', err);
+            }
+        }
+
+        urlInput.addEventListener('input', function() {
+            const inputURL = this.value.trim();
+            
+            if (!inputURL) {
+                output.textContent = '여기에 정리된 링크가 표시됩니다';
+                output.classList.add('empty');
+                copyBtn.style.display = 'none';
+                return;
+            }
+
+            const beautified = beautifyURL(inputURL);
+            
+            if (beautified) {
+                output.textContent = beautified;
+                output.classList.remove('empty');
+                copyBtn.style.display = 'block';
+                copyToClipboard(beautified);
+            } else {
+                output.textContent = '올바른 URL 형식이 아닙니다';
+                output.classList.add('empty');
+                copyBtn.style.display = 'none';
+            }
+        });
+
+        copyBtn.addEventListener('click', function() {
+            const text = output.textContent;
+            if (text && !output.classList.contains('empty')) {
+                copyToClipboard(text);
+            }
+        });
+
+        urlInput.addEventListener('paste', function(e) {
+            setTimeout(() => {
+                this.dispatchEvent(new Event('input'));
+            }, 0);
+        });
+    </script>
+</body>
+</html>
