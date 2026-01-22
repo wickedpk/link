@@ -1,10 +1,24 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Link Beautify</title>
     <style>
+        :root {
+            --bg-color: #fafafa;
+            --card-bg: #ffffff;
+            --text-primary: #111111;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --primary-color: #007AFF;
+            /* Blue for emphasis */
+            --error-color: #FF3B30;
+            /* Red for errors */
+            --hover-color: #0056b3;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,7 +27,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: var(--bg-color);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -22,108 +37,115 @@
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            /* Softer, smaller radius */
             padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            /* Minimal shadow, just enough to separate */
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             max-width: 600px;
             width: 100%;
         }
 
         h1 {
-            color: #667eea;
-            font-size: 2.5em;
+            color: var(--text-primary);
+            font-size: 2em;
             margin-bottom: 10px;
             text-align: center;
+            font-weight: 700;
         }
 
         .subtitle {
-            color: #666;
+            color: var(--text-secondary);
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             font-size: 0.95em;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         label {
             display: block;
-            color: #333;
+            color: var(--text-primary);
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 0.9em;
         }
 
         input[type="text"] {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             font-size: 1em;
-            transition: all 0.3s ease;
+            background: #fff;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
         }
 
         .output-box {
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
+            background: #f5f5f5;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
             min-height: 50px;
             word-break: break-all;
-            color: #333;
-            font-family: 'Courier New', monospace;
+            color: var(--text-primary);
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            font-size: 0.95em;
         }
 
         .output-text {
             flex: 1;
-            color: #667eea;
-            font-weight: 600;
+            color: var(--primary-color);
+            /* Emphasis on result */
+            font-weight: 500;
         }
 
         .output-text.empty {
-            color: #999;
-            font-style: italic;
-            font-weight: normal;
+            color: var(--text-secondary);
+            font-style: normal;
+            font-weight: 400;
+        }
+
+        .output-text.error {
+            color: var(--error-color);
+            /* Red for errors */
         }
 
         .copy-btn {
-            background: #667eea;
+            background: var(--primary-color);
             color: white;
             border: none;
             padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.85em;
-            margin-left: 10px;
-            transition: all 0.3s ease;
-            white-space: nowrap;
+            margin-left: 12px;
+            font-weight: 500;
+            transition: background 0.2s ease;
         }
 
         .copy-btn:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-        }
-
-        .copy-btn:active {
-            transform: translateY(0);
+            background: var(--hover-color);
         }
 
         .status-message {
             text-align: center;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 6px;
             font-size: 0.9em;
             margin-top: 20px;
             opacity: 0;
@@ -135,44 +157,63 @@
         }
 
         .status-message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            /* Minimal success style: Text only or subtle background */
+            color: var(--primary-color);
+            /* Reusing Blue for 'Action Success' as requested or kept simple */
+            font-weight: 500;
+        }
+
+        .status-message.error {
+            color: var(--error-color);
+            font-weight: 500;
         }
 
         .example {
-            background: #f8f9fa;
-            border-left: 4px solid #667eea;
-            padding: 15px;
-            margin-top: 30px;
-            border-radius: 5px;
+            border-top: 1px solid var(--border-color);
+            /* Separator instead of box */
+            padding-top: 20px;
+            margin-top: 40px;
+            background: transparent;
+            border-radius: 0;
+            border-left: none;
+            padding-left: 0;
         }
 
         .example-title {
             font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            font-size: 0.9em;
         }
 
         .example-content {
             font-size: 0.85em;
-            color: #666;
-            line-height: 1.6;
+            color: var(--text-secondary);
+            line-height: 1.7;
         }
 
         .example-link {
             display: block;
             word-break: break-all;
-            margin: 5px 0;
-            font-family: 'Courier New', monospace;
+            margin: 4px 0;
+            font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+            color: var(--text-secondary);
+        }
+
+        /* Make the result link in example stand out slightly less or keep it neutral */
+        .example-link.result {
+            color: var(--text-primary);
         }
 
         .arrow {
-            color: #667eea;
-            margin: 5px 0;
+            color: var(--text-secondary);
+            display: block;
+            margin: 4px 0;
+            font-size: 0.8em;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>🔗 Link Beautify</h1>
@@ -180,7 +221,8 @@
 
         <div class="input-group">
             <label for="urlInput">URL 입력</label>
-            <input type="text" id="urlInput" placeholder="https://example.com/page?param1=value1&param2=value2..." autofocus>
+            <input type="text" id="urlInput" placeholder="https://example.com/page?param1=value1&param2=value2..."
+                autofocus>
         </div>
 
         <div class="input-group">
@@ -196,17 +238,10 @@
         <div class="example">
             <div class="example-title">💡 사용 예시</div>
             <div class="example-content">
-                <strong>게시판 링크</strong>
-                <span class="example-link">입력: http://alphaenc.kr/bbs/board.php?bo_table=alpha_qna&wr_id=8540&sst=wr_hit&sod=desc&page=191</span>
+                <strong>사용 예시</strong>
+                <span class="example-link">입력: https://example.com/item?id=123&utm_source=ad</span>
                 <span class="arrow">↓</span>
-                <span class="example-link">결과: http://alphaenc.kr/bbs/board.php?bo_table=alpha_qna&wr_id=8540</span>
-                
-                <br><br>
-                
-                <strong>쇼핑몰 링크</strong>
-                <span class="example-link">입력: https://item.gmarket.co.kr/Item?spm=...&goodscode=4616754557&utparam-url=...</span>
-                <span class="arrow">↓</span>
-                <span class="example-link">결과: https://item.gmarket.co.kr/Item?goodscode=4616754557&spm=...</span>
+                <span class="example-link">결과: https://example.com/item?id=123</span>
             </div>
         </div>
     </div>
@@ -221,27 +256,104 @@
             try {
                 const urlObj = new URL(url);
                 const params = new URLSearchParams(urlObj.search);
-                
-                // 보존할 주요 파라미터들
-                const keepParams = [
-                    'bo_table', 'wr_id',  // 그누보드
-                    'id', 'no', 'idx', 'num',  // 일반 게시판
-                    'article_id', 'post_id', 'board_id',  // 기타 게시판
-                    'goodscode', 'spm',  // G마켓, 쿠팡 등 쇼핑몰
-                    'itemId', 'productId', 'prod_id',  // 기타 쇼핑몰
-                    'v', 'video_id',  // 유튜브
-                ];
                 const newParams = new URLSearchParams();
-                
-                keepParams.forEach(param => {
-                    if (params.has(param)) {
-                        newParams.set(param, params.get(param));
+                const hostname = urlObj.hostname.toLowerCase().replace(/^www\./, '');
+
+                // 1. 파라미터 분류 정의
+                const paramDefs = {
+                    // Strong Identity: 구체적인 콘텐츠 하나를 지칭 (이게 있으면 페이지/정렬 정보 제거)
+                    strongIdentity: [
+                        'id', 'no', 'idx', 'num', 'key', 'index',
+                        'article_id', 'post_id', 'logNo',
+                        'prod_id', 'product_id', 'item_id', 'goods_no', 'goodscode',
+                        'wr_id', // gnuboard post id
+                        'itemId', 'vendorItemId', // coupang
+                        'v', // youtube video
+                        'prdNo', 'itemno', // other shops
+                        'docId'
+                    ],
+                    // Weak Identity: 게시판, 카테고리, 상점 등 그룹을 지칭 (이것만 있으면 페이지 정보 유지 필요)
+                    weakIdentity: [
+                        'bo_table', 'board_id', 'cafe_id', 'club_id', 'blogId', 'dirId'
+                    ],
+                    // Context: 리스트, 정렬, 검색 등 문맥 파라미터 (상세 페이지에서는 제거 대상)
+                    // category, cat, class는 상황에 따라 Identity가 될 수도 있지만, 
+                    // 상세 페이지(Strong Identity)가 있을 땐 제거되어야 하므로 Context로 분류함이 적절
+                    context: [
+                        'page', 'pg', 'p', 'offset',
+                        'q', 'query', 'kwd', 'keyword', 'search', 'target',
+                        'sort', 'order', 'filter', 'view', 'mode', 'tab',
+                        'sst', 'sod', 's_type', 's_keyword',
+                        'date', 'year', 'month', 'day',
+                        'where', 'sm', 'n_media', 'n_query', 'n_rank', 'n_ad_group',
+                        'category', 'cat', 'class'
+                    ],
+                    tracking: []
+                };
+
+                // 2. 도메인별 추가 허용 규칙
+                const domainRules = {
+                    'youtube.com': ['t', 'index', 'ab_channel', 'list'],
+                    'youtu.be': ['t'],
+                    'naver.com': ['idxno', 'nid', 'sc'],
+                    'map.naver.com': ['lat', 'lng', 'dlevel', 'type'],
+                    'coupang.com': ['src', 'spec', 'isAddedCart'],
+                };
+
+                // 허용 목록 구성
+                let allowedStrong = new Set(paramDefs.strongIdentity);
+                let allowedWeak = new Set(paramDefs.weakIdentity);
+                let allowedContext = new Set(paramDefs.context);
+                let domainSpecific = new Set();
+
+                // 도메인 매칭
+                for (const [domain, specificParams] of Object.entries(domainRules)) {
+                    if (hostname.endsWith(domain)) {
+                        specificParams.forEach(p => domainSpecific.add(p));
+                    }
+                }
+
+                // 3. 파라미터 분석 (Strong Identity 존재 여부 확인)
+                let hasStrongIdentity = false;
+
+                // 3-1. 쿼리 파라미터 체크
+                params.forEach((_, key) => {
+                    if (allowedStrong.has(key)) {
+                        hasStrongIdentity = true;
                     }
                 });
-                
+
+                // 3-2. 경로(Path) 체크: 숫자로 끝나는 경로는 보통 ID를 포함함 (Clien, Brunch 등)
+                // 예: /board/park/12345
+                if (!hasStrongIdentity) {
+                    const pathSegments = urlObj.pathname.split('/');
+                    const lastSegment = pathSegments[pathSegments.length - 1];
+                    // 숫자로만 구성되어 있거나 (12345), 숫자로 끝나는 패턴 처리
+                    if (/^\d+$/.test(lastSegment)) {
+                        hasStrongIdentity = true;
+                    }
+                }
+
+                // 4. 파라미터 필터링 및 재구성
+                params.forEach((value, key) => {
+                    // 1) Identity (Strong & Weak) & Domain Specific: 무조건 유지
+                    if (allowedStrong.has(key) || allowedWeak.has(key) || domainSpecific.has(key)) {
+                        newParams.set(key, value);
+                        return;
+                    }
+
+                    // 2) Context 파라미터: Strong Identity가 없을 때만 유지
+                    if (allowedContext.has(key)) {
+                        if (!hasStrongIdentity) {
+                            newParams.set(key, value);
+                        }
+                    }
+                });
+
                 const queryString = newParams.toString();
                 return urlObj.origin + urlObj.pathname + (queryString ? '?' + queryString : '');
             } catch (e) {
+                console.error(e);
                 return null;
             }
         }
@@ -284,42 +396,46 @@
             }
         }
 
-        urlInput.addEventListener('input', function() {
+        urlInput.addEventListener('input', function () {
             const inputURL = this.value.trim();
-            
+
             if (!inputURL) {
                 output.textContent = '여기에 정리된 링크가 표시됩니다';
                 output.classList.add('empty');
+                output.classList.remove('error');
                 copyBtn.style.display = 'none';
                 return;
             }
 
             const beautified = beautifyURL(inputURL);
-            
+
             if (beautified) {
                 output.textContent = beautified;
                 output.classList.remove('empty');
+                output.classList.remove('error');
                 copyBtn.style.display = 'block';
                 copyToClipboard(beautified);
             } else {
                 output.textContent = '올바른 URL 형식이 아닙니다';
-                output.classList.add('empty');
+                output.classList.remove('empty');
+                output.classList.add('error');
                 copyBtn.style.display = 'none';
             }
         });
 
-        copyBtn.addEventListener('click', function() {
+        copyBtn.addEventListener('click', function () {
             const text = output.textContent;
             if (text && !output.classList.contains('empty')) {
                 copyToClipboard(text);
             }
         });
 
-        urlInput.addEventListener('paste', function(e) {
+        urlInput.addEventListener('paste', function (e) {
             setTimeout(() => {
                 this.dispatchEvent(new Event('input'));
             }, 0);
         });
     </script>
 </body>
+
 </html>
