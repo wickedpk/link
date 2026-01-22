@@ -254,7 +254,17 @@
 
         function beautifyURL(url) {
             try {
-                const urlObj = new URL(url);
+                let urlObj;
+                try {
+                    urlObj = new URL(url);
+                } catch (e) {
+                    // 프로토콜이 없는 경우 https://를 붙여서 재시도
+                    try {
+                        urlObj = new URL('https://' + url);
+                    } catch (e2) {
+                        return null;
+                    }
+                }
                 const params = new URLSearchParams(urlObj.search);
                 const newParams = new URLSearchParams();
                 const hostname = urlObj.hostname.toLowerCase().replace(/^www\./, '');
