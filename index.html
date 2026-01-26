@@ -269,6 +269,16 @@
                 const newParams = new URLSearchParams();
                 const hostname = urlObj.hostname.toLowerCase().replace(/^www\./, '');
 
+                // Daangn Market Community URL Shortener
+                if (hostname.endsWith('daangn.com') && urlObj.pathname.includes('/community/')) {
+                    const match = urlObj.pathname.match(/\/community\/.*-([a-zA-Z0-9]+)\/?$/);
+                    if (match && match[1]) {
+                        // Preserve prefix (e.g. /kr) and keep only the ID
+                        const prefix = urlObj.pathname.substring(0, urlObj.pathname.indexOf('/community/'));
+                        urlObj.pathname = `${prefix}/community/${match[1]}/`;
+                    }
+                }
+
                 // 1. 파라미터 분류 정의
                 const paramDefs = {
                     // Strong Identity: 구체적인 콘텐츠 하나를 지칭 (이게 있으면 페이지/정렬 정보 제거)
