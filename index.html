@@ -269,14 +269,47 @@
                 const newParams = new URLSearchParams();
                 const hostname = urlObj.hostname.toLowerCase().replace(/^www\./, '');
 
-                // Daangn Market Community URL Shortener
-                if (hostname.endsWith('daangn.com') && urlObj.pathname.includes('/community/')) {
-                    const match = urlObj.pathname.match(/\/community\/.*-([a-zA-Z0-9]+)\/?$/);
-                    if (match && match[1]) {
-                        // Preserve prefix (e.g. /kr) and keep only the ID
-                        const prefix = urlObj.pathname.substring(0, urlObj.pathname.indexOf('/community/'));
-                        urlObj.pathname = `${prefix}/community/${match[1]}/`;
+                // Generic Slug-ID URL Shortener (Handles Daangn, etc.)
+                // Pattern: .../slug-id/ -> .../id/
+                try {
+                    const pathSegments = urlObj.pathname.split('/');
+                    // Filter empty segments to handle trailing slashes robustly
+                    const segments = pathSegments.filter(s => s.length > 0);
+
+                    if (segments.length > 0) {
+                        const lastSegment = segments[segments.length - 1];
+                        // Match: (Slug)-(ID)
+                        // Heuristic: ID is alphanumeric at the end. Slug is everything before the last hyphen.
+                        const match = lastSegment.match(/^(.*)-([a-zA-Z0-9]+)$/);
+
+                        if (match) {
+                            const slug = match[1];
+                            const id = match[2];
+
+                            let shouldShorten = false;
+
+                            // Rule 1: Always shorten for known domains (Daangn)
+                            if (hostname.endsWith('daangn.com')) {
+                                shouldShorten = true;
+                            }
+                            // Rule 2: If slug contains percent-encoded characters (likely Korean/non-Latin title)
+                            else if (slug.includes('%')) {
+                                shouldShorten = true;
+                            }
+                            // Rule 3: If ID is long enough (avoid incidental dates like 2024-01-01)
+                            else if (id.length > 4) {
+                                shouldShorten = true;
+                            }
+
+                            if (shouldShorten) {
+                                // Reconstruct path: replace last segment with just ID
+                                const newPath = urlObj.pathname.replace(lastSegment, id);
+                                urlObj.pathname = newPath;
+                            }
+                        }
                     }
+                } catch (e) {
+                    console.warn('Path shortening failed:', e);
                 }
 
                 // 1. 파라미터 분류 정의
